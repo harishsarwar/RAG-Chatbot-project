@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chatbot</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #FFD700;  /* Gold color */
+        }
+
+        form {
+            margin: 20px;
+        }
+
+        input[type="file"],
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            color: #333;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #FFD700;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #ffcc00;
+        }
+
+        #response {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        img {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        #loading {
+            color: #FFD700;
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+        }
+
+        #upload-form, #chat-form {
+            pointer-events: all;
+        }
+
+        #upload-form[disabled], #chat-form[disabled] {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Add logo here -->
+    <img src="logo.png" alt="RAG Chatbot Logo">
+
+    <h1>Upload PDF and Ask Questions</h1>
+
+    <!-- Upload PDF Form -->
+    <form id="upload-form" method="POST" enctype="multipart/form-data">
+        <input type="file" name="pdf" accept="application/pdf" required />
+        <button type="submit">Upload PDF</button>
+    </form>
+    
+    <br>
+
+    <!-- Ask Question Form -->
+    <form id="chat-form">
+        <input type="text" id="question" placeholder="Enter your question" required />
+        <button type="submit">Ask</button>
+    </form>
+
+    <!-- Loading indicator -->
+    <div id="loading">Processing... Please wait...</div>
+
+    <!-- Response Display -->
+    <div id="response"></div>
+
+    <script>
+        document.getElementById("upload-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            // Show loading message and disable the upload form
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("upload-form").disabled = true;
+
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            // Hide loading message and enable the form
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("upload-form").disabled = false;
+
+            alert(data.message || data.error);
+        });
+
+        document.getElementById("chat-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const question = document.getElementById("question").value;
+
+            // Show loading message and disable the question form
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("chat-form").disabled = true;
+
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question }),
+            });
+
+            const data = await response.json();
+
+            // Hide loading message, enable the form, and display the response
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("chat-form").disabled = false;
+
+            document.getElementById("response").innerText = data.response || data.error;
+        });
+    </script>
+</body>
+</html>

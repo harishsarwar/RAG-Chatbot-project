@@ -1,0 +1,15 @@
+langchain-huggingface
+## For API Calls
+huggingface_hub
+transformers
+accelerate
+bitsandbytes
+langchain
+Flask
+langchain
+langchain-community
+langchain-huggingface
+sentence-transformers
+chromadb>=0.4.0,<0.6.0
+PyPDF2
+transformers
